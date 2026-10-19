@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#121417">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="manifest" href="historyfinal.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>History Final — ΠΕΓΠ</title>
+<style>
+:root{
+  --bg:#121417; --panel:#1c1f24; --panel2:#262a31; --line:#343a44;
+  --neon:#ff2d95; --neonink:#0b0c0e;
+  --card:#f6f5f1; --ink:#1b1d21; --soft:#646a73; --cline:#e0ddd3;
+  --live:#c9d1db; --known:#4ade80;
+  --l1:#4ade80; --l2:#facc15; --l3:#fb923c; --l4:#f43f5e; --lp:#c084fc;
+  --dim:#9aa3ae;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0;background:var(--bg);color:#eef1f4;
+  font-family:"Segoe UI",Roboto,"Noto Sans","Helvetica Neue",Arial,sans-serif}
+body{padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
+.wrap{max-width:640px;margin:0 auto;padding:14px 14px 26px}
+button{font-family:inherit;cursor:pointer;color:inherit}
+
+header{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:2px 2px 12px}
+h1{font-size:19px;margin:0;font-weight:800;letter-spacing:.2px;display:flex;align-items:center;gap:9px}
+h1 .badge{background:var(--neon);color:var(--neonink);font-weight:900;border-radius:7px;
+  width:30px;height:30px;display:inline-flex;align-items:center;justify-content:center;font-size:19px}
+h1 em{font-style:normal;color:var(--neon)}
+#counter{font-size:13px;color:var(--dim);white-space:nowrap}
+
+/* ---- levels ---- */
+.levels{display:flex;flex-direction:column;gap:7px;margin-bottom:12px}
+.lv{display:grid;grid-template-columns:1fr 62px 62px 34px;gap:6px;align-items:stretch}
+.lv .name{background:var(--panel);border-radius:9px;border-left:5px solid var(--lc);
+  padding:8px 9px;display:flex;flex-direction:column;justify-content:center;min-width:0}
+.lv .name b{font-size:14px;line-height:1.15}
+.lv .name small{font-size:11px;color:var(--dim);margin-top:2px}
+.pb{background:var(--panel);border:2px solid transparent;border-radius:9px;padding:6px 2px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1}
+.pb .num{font-size:20px;font-weight:800}
+.pb .lbl{font-size:9.5px;letter-spacing:.8px;text-transform:uppercase;color:var(--dim);margin-top:4px}
+.pb.live .num{color:var(--live)}
+.pb.known .num{color:var(--known)}
+.pb.on{border-color:var(--neon);background:var(--panel2)}
+.pb.on .lbl{color:#fff}
+.pb:disabled{opacity:.35}
+.rst{background:none;border:1px solid var(--line);border-radius:9px;color:var(--dim);font-size:16px;padding:0}
+.lv.fixed{grid-template-columns:1fr}
+.fixbtn{background:var(--panel);border:2px solid transparent;border-left:5px solid var(--lc);border-radius:9px;
+  padding:9px 11px;display:flex;align-items:baseline;gap:10px;text-align:left}
+.fixbtn .num{font-size:20px;font-weight:800;color:var(--lc)}
+.fixbtn b{font-size:14px}
+.fixbtn small{margin-left:auto;font-size:11px;color:var(--dim)}
+.fixbtn.on{border-color:var(--neon);border-left-color:var(--lc);background:var(--panel2)}
+.studying{font-size:12px;color:var(--dim);text-align:center;margin:0 0 10px}
+.studying b{color:#fff}
+
+/* ---- card ---- */
+.card{background:var(--card);color:var(--ink);border-radius:12px;padding:16px 16px 20px;min-height:300px;
+  border-top:6px solid var(--lc,var(--neon))}
+.qnum{font-size:11px;letter-spacing:1.4px;text-transform:uppercase;color:var(--soft);margin-bottom:10px;font-weight:700}
+.instr{font-size:13px;line-height:1.5;color:var(--soft);margin-bottom:11px}
+.qtext{font-size:19px;font-weight:700;line-height:1.42;margin:0 0 14px;white-space:pre-wrap}
+.qimg{display:block;width:100%;max-width:340px;margin:0 auto 14px;border-radius:8px}
+.opts{list-style:none;margin:0;padding:0}
+.opt{display:flex;gap:10px;align-items:flex-start;padding:11px 8px;border-top:1px solid var(--cline);
+  font-size:16px;line-height:1.42;border-radius:7px;cursor:pointer}
+.opt .k{font-weight:800;color:var(--soft);min-width:18px}
+.opt.correct{background:#d5f0da}.opt.correct .k{color:#1f7a3c}
+.opt.wrong{background:#f8d9d5}.opt.wrong .k{color:#b3352a}
+.opt.dim{opacity:.55}
+.opts.locked .opt{cursor:default}
+.body{font-size:16px;line-height:1.55}
+.body p{margin:0 0 12px;white-space:pre-wrap}
+ol.items,ul.lines{margin:0;padding:0;list-style:none}
+ol.items li,ul.lines li{padding:8px 0;border-bottom:1px solid var(--cline)}
+ol.items li:last-child,ul.lines li:last-child{border-bottom:0}
+table.match{width:100%;border-collapse:collapse;font-size:14.5px;line-height:1.4}
+table.match th{background:#e9e5d8;text-align:left;font-size:12px;letter-spacing:.5px;padding:8px}
+table.match td{border:1px solid #d9d4c5;padding:8px;vertical-align:top}
+.answer{margin-top:16px;padding:13px 13px;background:#e6edf0;border-left:5px solid var(--lc,var(--neon));border-radius:7px}
+.answer .al{font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--soft);font-weight:800;margin-bottom:6px}
+.answer .at{font-size:16.5px;line-height:1.5;white-space:pre-wrap;font-weight:600}
+.answer img{width:100%;border-radius:5px;display:block;margin-top:4px}
+.verdict{margin-top:14px;font-size:15px;font-weight:800}
+.verdict.ok{color:#1f7a3c}.verdict.no{color:#b3352a}
+.tap{margin-top:10px;font-size:12.5px;color:var(--soft)}
+.empty{text-align:center;color:var(--soft);font-size:16px;padding:56px 18px;line-height:1.6}
+
+/* ---- controls ---- */
+.big{display:block;width:100%;margin-top:12px;padding:15px;border:0;border-radius:10px;
+  background:var(--neon);color:var(--neonink);font-size:17px;font-weight:800}
+.sortrow{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:12px}
+.sortrow button{background:var(--panel);border:2px solid var(--line);border-radius:10px;padding:11px 6px;
+  font-size:15px;font-weight:800;line-height:1.25}
+.sortrow button small{display:block;font-size:11px;font-weight:400;color:var(--dim);margin-top:2px}
+.sortrow .s-live{color:var(--live)}.sortrow .s-known{color:var(--known)}
+.sortrow button.cur{border-color:currentColor;background:var(--panel2)}
+.navrow{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px;margin-top:12px}
+.navrow button{background:var(--panel);border:1px solid var(--line);border-radius:9px;padding:11px 6px;font-size:14px;color:#dfe5ea}
+.navrow button:disabled{opacity:.35}
+.goto{display:flex;align-items:center;gap:8px;margin-top:14px;font-size:13px;color:var(--dim);flex-wrap:wrap}
+.goto input{width:76px;padding:9px 10px;border-radius:9px;border:1px solid var(--line);background:var(--panel);color:#eef1f4;font:inherit;font-size:15px;text-align:center}
+.goto button{padding:9px 16px;border-radius:9px;border:0;background:var(--neon);color:var(--neonink);font-size:14px;font-weight:800}
+#gotoMsg{flex-basis:100%;min-height:16px;font-size:12px;line-height:1.5}
+footer{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:16px;font-size:12px;color:var(--dim);flex-wrap:wrap}
+footer .acts{display:flex;gap:14px}
+footer .acts button{background:none;border:0;color:var(--dim);text-decoration:underline;padding:4px 0;font-size:12px}
+#restoreFile{display:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1><span class="badge">Ι</span><span>History <em>Final</em></span></h1>
+    <div id="counter"></div>
+  </header>
+  <div class="levels" id="levels"></div>
+  <div class="studying" id="studying"></div>
+  <div class="card" id="card"></div>
+  <div id="controls"></div>
+  <div class="navrow">
+    <button id="prev">← Back</button>
+    <button id="shuffle">Shuffle</button>
+    <button id="next">Next →</button>
+  </div>
+  <div class="goto"><label for="gotoN">Go to question</label><input id="gotoN" type="number" inputmode="numeric" placeholder="no."><button id="gotoBtn" type="button">Go</button><span id="gotoMsg"></span></div>
+  <footer>
+    <span id="foot"></span>
+    <span class="acts">
+      <button id="backup">Backup</button>
+      <button id="restore">Restore</button>
+      <button id="resetAll">Reset all</button>
+    </span>
+    <input type="file" id="restoreFile" accept="application/json,.json">
+  </footer>
+</div>
+<script>
+var APP = {"id": "historyfinal", "key": "pegp-historyfinal-v1"};
+var TIERS = [{"id": "a", "name": "Practise", "sub": "", "lvl": "l1", "ns": [54, 55, 57, 58, 67, 76, 77, 80], "fixed": false}, {"id": "b", "name": "Intermediate", "sub": "", "lvl": "l2", "ns": [69], "fixed": false}, {"id": "c", "name": "Active work", "sub": "", "lvl": "l4", "ns": [17, 60, 72], "fixed": false}, {"id": "p", "name": "Produce", "sub": "write it, then reveal · permanent", "lvl": "lp", "ns": [61, 63, 64, 65, 66, 67], "fixed": true}];
+var ITEMS = [{"n": 17, "label": "Question 17", "body": "<p class=\"qtext\">Ποια μάχη οδήγησε στην απελευθέρωση της Θεσσαλονίκης;<\/p>", "k": "mcq", "opts": [["Α", "του Μπιζανίου"], ["Β", "του Σαρανταπόρου"], ["Γ", "των Γιαννιτσών"], ["Δ", "του Σιδηροκάστρου"]], "c": "Γ"}, {"n": 54, "label": "Question 54", "body": "<p class=\"qtext\">Αντιστοιχίστε:<br>ΣΤΗΛΗ Ι: 1 Αθανάσιος Διάκος · 2 Οδυσσέας Ανδρούτσος · 3 Γεώργιος Καραϊσκάκης · 4 Θεόδωρος Κολοκοτρώνης<br>ΣΤΗΛΗ ΙΙ: Α Μάχη του Φαλήρου · Β Απελευθέρωση της Τριπολιτσάς · Γ Μάχη της Αλαμάνας · Δ Χάνι της Γραβιάς<\/p>", "k": "rev", "ans": "1Γ, 2Δ, 3Α, 4Β"}, {"n": 55, "label": "Question 55", "body": "<p class=\"qtext\">Αντιστοιχίστε:<br>ΣΤΗΛΗ Ι: 1 1941-1944 · 2 1863-1913 · 3 1919-1922 · 4 1833-1862<br>ΣΤΗΛΗ ΙΙ: Α Περίοδος Βασιλείας Γεωργίου Α΄ · Β Μικρασιατική Εκστρατεία · Γ Περίοδος διακυβέρνησης του Βασιλιά Όθωνα · Δ Κατοχή από τις δυνάμεις του Άξονα<\/p>", "k": "rev", "ans": "1Δ, 2Α, 3Β, 4Γ"}, {"n": 57, "label": "Question 57", "body": "<p class=\"qtext\">Αντιστοιχίστε:<br>ΣΤΗΛΗ Ι: 1 Αρματολοί · 2 Φαναριώτες · 3 Πατριάρχης · 4 Δημογέροντες<br>ΣΤΗΛΗ ΙΙ: Α Κοινοτικοί Άρχοντες · Β Ανυπότακτοι στους Τούρκους · Γ Επικεφαλής της Ορθόδοξης Εκκλησίας · Δ Έλληνες άρχοντες της Κωνσταντινούπολης<\/p>", "k": "rev", "ans": "1Β, 2Δ, 3Γ, 4Α"}, {"n": 58, "label": "Question 58", "body": "<p class=\"qtext\">Αντιστοιχίστε:<br>ΣΤΗΛΗ Ι: 1 Δάσκαλοι του Γένους · 2 Οδησσός · 3 Ρήγας Φεραίος · 4 Αλή Πασάς<br>ΣΤΗΛΗ ΙΙ: Α Ελληνική παροικία · Β Μορφωμένοι Έλληνες Τουρκοκρατίας · Γ Νεοελληνικός Διαφωτισμός · Δ Ιωάννινα<\/p>", "k": "rev", "ans": "1Β, 2Α, 3Γ, 4Δ"}, {"n": 60, "label": "Question 60", "body": "<p class=\"qtext\">Αντιστοιχίστε πρόσωπα με έτη:<br>ΣΤΗΛΗ Ι: 1 Κωνσταντίνος Παλαιολόγος · 2 Ιωάννης Μεταξάς · 3 Γεώργιος Παπανδρέου · 4 Αλέξης Τσίπρας<br>ΣΤΗΛΗ ΙΙ: Α 2015 · Β 1964 · Γ 1453 · Δ 1940<\/p>", "k": "rev", "ans": "1Γ, 2Δ, 3Β, 4Α"}, {"n": 61, "label": "Question 61", "body": "<p class=\"qtext\">Συμπληρώστε:<br>(1) ____ ήταν βασιλιάς όταν η Μακεδονία υπέταξε και ένωσε όλες τις υπόλοιπες αρχαιοελληνικές πόλεις-κράτη.<br>Τελευταίος αυτοκράτορας του Βυζαντίου ήταν ο (2) ____.<br>Την Ελληνική Επανάσταση άρχισε από τη Μολδοβλαχία ο (3) ____.<br>Πρώτος κυβερνήτης του νέου ελληνικού κράτους ήταν ο (4) ____.<\/p>", "k": "rev", "ans": "1. Φίλιππος Β΄ · 2. Κωνσταντίνος ΙΑ΄ Παλαιολόγος · 3. Αλέξανδρος Υψηλάντης · 4. Ιωάννης Καποδίστριας"}, {"n": 63, "label": "Question 63", "body": "<p class=\"qtext\">Συμπληρώστε:<br>Η (1) ____ της Κωνσταντινούπολης από τους (2) ____ το 1453 ήταν η κατάληξη της παρακμής του βυζαντινού κόσμου.<br>Στην (3) ____ Αυτοκρατορία οι υπόδουλοι Έλληνες πλήρωναν πολλούς φόρους, όπως τον (4) ____ φόρο, γνωστό και ως χαράτσι.<\/p>", "k": "rev", "ans": "1. Άλωση · 2. Οθωμανούς · 3. Οθωμανική · 4. κεφαλικό"}, {"n": 64, "label": "Question 64", "body": "<p class=\"qtext\">Συμπληρώστε:<br>Ο (1) ____ εκτός από θρησκευτικός ηγέτης ήταν και εκπρόσωπος των υπόδουλων ορθόδοξων Χριστιανών.<br>Ο (2) ____ έφθασε στην Πελοπόννησο το 1821 για να ηγηθεί της Ελληνικής Επανάστασης.<br>Ο (3) ____ ίδρυσε το Ορφανοτροφείο στην Αίγινα το 1828.<br>Ο (4) ____ σκοτώθηκε στο Μανιάκι τον Μάιο του 1825.<\/p>", "k": "rev", "ans": "1. Πατριάρχης · 2. Δημήτριος Υψηλάντης · 3. Ιωάννης Καποδίστριας · 4. Παπαφλέσσας"}, {"n": 65, "label": "Question 65", "body": "<p class=\"qtext\">Συμπληρώστε:<br>Το πιο γνωστό (1) ____ της αρχαίας Ελλάδας ήταν αυτό που υπήρχε στους (2) ____. Εκεί οι μάντεις έδιναν χρησμούς.<br>Στους (3) ____ αγώνες απαγορευόταν η συμμετοχή των γυναικών. Το (4) ____ ήταν ένα από τα σημαντικότερα αθλήματα.<\/p>", "k": "rev", "ans": "1. Μαντείο · 2. Δελφούς · 3. Ολυμπιακούς · 4. Πένταθλο"}, {"n": 66, "label": "Question 66", "body": "<p class=\"qtext\">Συμπληρώστε:<br>«Βαυαροκρατία» ονομάζουμε την περίοδο 1833-1835 (από τη στιγμή που ο (1) ____ ήρθε στην Ελλάδα μέχρι που ενηλικιώθηκε).<br>(2) ____ στην αρχαία Αθήνα ονομαζόταν η έμμεση φορολογία (λειτουργία) για να ανέβει στο θέατρο μια τραγωδία.<br>(3) ____ υπήρξε ο πρώτος κυβερνήτης της Ελλάδας.<br>(4) ____ ονομάστηκαν οι τεράστιες διαδηλώσεις του 1965.<\/p>", "k": "rev", "ans": "1. Ο Όθωνας · 2. Χορηγία · 3. Ο Ιωάννης Καποδίστριας · 4. Ιουλιανά"}, {"n": 67, "label": "Question 67", "body": "<p class=\"qtext\">Συμπληρώστε:<br>Η περίοδος μετά την πτώση της δικτατορίας τον Ιούλιο του 1974 ονομάζεται (1) ____.<br>Η περίοδος του 5ου αι. π.Χ. με τον Περικλή ονομάζεται (2) ____.<br>Το παγκόσμιο κίνημα συμπαράστασης στους Έλληνες κατά την Επανάσταση ονομάζεται (3) ____.<br>Η περίοδος 1904-1908 στη Μακεδονία ονομάστηκε (4) ____.<\/p>", "k": "rev", "ans": "1. Μεταπολίτευση · 2. Χρυσός Αιώνας · 3. Φιλελληνισμός · 4. Μακεδονικός Αγώνας"}, {"n": 69, "label": "Question 69", "body": "<p class=\"qtext\">Σωστό ή Λάθος;<br>1. Ο Λόρδος Βύρωνας πέθανε στο Μεσολόγγι το 1824.<br>2. Ο Βασιλιάς Γεώργιος Α΄ δολοφονήθηκε στη Θεσσαλονίκη το 1913.<br>3. Έλληνες πρόσφυγες είχαν φθάσει στην Ελλάδα και πριν από τη Μικρασιατική Καταστροφή.<br>4. Η Θεσσαλονίκη ενσωματώθηκε στην Ελλάδα το 1830.<\/p>", "k": "rev", "ans": "1. Σ · 2. Σ · 3. Σ · 4. Λ"}, {"n": 72, "label": "Question 72", "body": "<p class=\"qtext\">Σωστό ή Λάθος;<br>1. Οι αρματολοί ήταν ένοπλα σώματα την περίοδο του Β΄ Παγκοσμίου Πολέμου.<br>2. Μεγάλη Ελλάδα ονομάστηκε η Ιωνία της Μικράς Ασίας.<br>3. Χρυσός αιώνας ήταν η περίοδος του β΄ μισού του 5ου αι. π.Χ.<br>4. Εθνικός διχασμός ήταν η εμφύλια διαμάχη 1915-1917 για τη συμμετοχή στον Α΄ Παγκόσμιο Πόλεμο.<\/p>", "k": "rev", "ans": "1. Λ · 2. Λ · 3. Σ · 4. Σ"}, {"n": 76, "label": "Question 76", "body": "<p class=\"qtext\">Σωστό ή Λάθος;<br>1. «Λαυρεωτικά»: η νομική διαφορά της Roux-Serpieri-Fressynet CIE με το ελληνικό δημόσιο για τα μεταλλεία του Λαυρίου.<br>2. Ο Αλέξανδρος Παπαναστασίου ήταν γνωστός συντηρητικός πολιτικός.<br>3. Οι γυναίκες της αρχαίας Αθήνας ζούσαν με περισσότερους περιορισμούς από τις Σπαρτιάτισσες.<br>4. Η Μάνη και τα Σφακιά ήταν αυτόνομες περιοχές που πλήρωναν μόνο φόρο υποτέλειας.<\/p>", "k": "rev", "ans": "1. Σ · 2. Λ · 3. Σ · 4. Σ"}, {"n": 77, "label": "Question 77", "body": "<p class=\"qtext\">Σωστό ή Λάθος;<br>1. Στόχος του Μεγάλου Αλεξάνδρου ήταν να μην αισθάνονται υποταγμένοι όσοι ζούσαν στην αυτοκρατορία του.<br>2. Ο Αλέξανδρος Παπάγος έγινε δικτάτορας με το σύνθημα «Ελληνικός Συναγερμός».<br>3. «Πανελλήνια ιδέα»: η πολιτική ένωση των Ελλήνων τον 4ο αι. π.Χ. και ο κοινός πόλεμος κατά των Περσών.<br>4. Επικεφαλής της Ένωσης Κέντρου, όταν ιδρύθηκε, ήταν ο Ανδρέας Παπανδρέου.<\/p>", "k": "rev", "ans": "1. Σ · 2. Λ · 3. Σ · 4. Λ"}, {"n": 80, "label": "Question 80", "body": "<p class=\"qtext\">Σωστό ή Λάθος;<br>1. Η Ελένη Σκούρα, η πρώτη ελληνίδα βουλευτής, εκλέχθηκε το 1953.<br>2. Ο Βασιλιάς Όθωνας ήρθε στην Ελλάδα το 1821.<br>3. Η Ελλάδα ήταν το πρώτο εθνικό κράτος στα Βαλκάνια που έγινε ανεξάρτητο, το 1830.<br>4. Τόσο στον Α΄ όσο και στον Β΄ Παγκόσμιο Πόλεμο η Ελλάδα ήταν με τη μεριά των νικητών.<\/p>", "k": "rev", "ans": "1. Σ · 2. Λ · 3. Σ · 4. Σ"}];
+</script>
+<script>
+(function(){
+var KEY = APP.key;
+var BY = {}; ITEMS.forEach(function(it){ BY[it.n] = it; });
+var FILING = TIERS.filter(function(t){ return !t.fixed; });
+var TIER_OF = {}; FILING.forEach(function(t){ t.ns.forEach(function(n){ TIER_OF[n] = t.id; }); });
+var TB = {}; TIERS.forEach(function(t){ TB[t.id] = t; });
+
+var S = {st:{}, ord:{}, sel:null, at:{}};
+var cur = null, revealed = false, picked = null;
+var $ = function(id){ return document.getElementById(id); };
+
+function load(){
+  try{ var raw = localStorage.getItem(KEY); if(raw){ var d = JSON.parse(raw); if(d && typeof d === 'object') S = d; } }catch(e){}
+  if(!S.st) S.st = {}; if(!S.ord) S.ord = {}; if(!S.at) S.at = {};
+  FILING.forEach(function(t){ t.ns.forEach(function(n){ if(S.st[n] !== 'live' && S.st[n] !== 'known') S.st[n] = 'live'; }); });
+  TIERS.forEach(function(t){
+    var o = S.ord[t.id];
+    var ok = Array.isArray(o) && o.length === t.ns.length && t.ns.every(function(n){ return o.indexOf(n) > -1; });
+    if(!ok) S.ord[t.id] = t.ns.slice();
+  });
+  if(!S.sel || !TB[S.sel.t]) S.sel = {t:TIERS[0].id, p:TIERS[0].fixed ? 'fix' : 'live'};
+}
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} }
+function pk(){ return S.sel.t + ':' + S.sel.p; }
+function matches(n){ return TB[S.sel.t].fixed || S.st[n] === S.sel.p; }
+function list(){ return S.ord[S.sel.t].filter(matches); }
+function count(t, p){ return t.ns.filter(function(n){ return S.st[n] === p; }).length; }
+function esc(s){ return String(s).replace(/[&<>]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c]; }); }
+
+function openSel(t, p, n){
+  S.sel = {t:t, p:p};
+  var l = list();
+  if(n != null && S.ord[t].indexOf(n) > -1) cur = n;
+  else { var a = S.at[pk()]; cur = (a != null && l.indexOf(a) > -1) ? a : (l.length ? l[0] : null); }
+  revealed = false; picked = null;
+  if(cur != null) S.at[pk()] = cur;
+  save(); render(); window.scrollTo(0,0);
+}
+function step(d){
+  var o = S.ord[S.sel.t], L = o.length;
+  if(!L) return;
+  var i = cur == null ? (d > 0 ? -1 : 0) : o.indexOf(cur), found = null;
+  for(var k = 1; k <= L; k++){ var n = o[((i + d*k) % L + L) % L]; if(matches(n)){ found = n; break; } }
+  cur = found; revealed = false; picked = null;
+  if(cur != null) S.at[pk()] = cur;
+  save(); render(); window.scrollTo(0,0);
+}
+function shuffle(){
+  var o = S.ord[S.sel.t];
+  for(var i = o.length - 1; i > 0; i--){ var j = Math.floor(Math.random() * (i + 1)); var x = o[i]; o[i] = o[j]; o[j] = x; }
+  var l = list(); cur = l.length ? l[0] : null; revealed = false; picked = null;
+  if(cur != null) S.at[pk()] = cur;
+  save(); render(); window.scrollTo(0,0);
+}
+function file(p){
+  if(cur == null || TB[S.sel.t].fixed) return;
+  S.st[cur] = p; save(); render(true);
+}
+function pick(k){
+  if(picked !== null || cur == null) return;
+  var it = BY[cur]; picked = k; revealed = true;
+  if(!TB[S.sel.t].fixed){ picked_prev = S.st[cur]; S.st[cur] = (k === it.c) ? 'known' : 'live'; save(); }
+  render(true);
+}
+var picked_prev = null;
+function resetTier(id){
+  var t = TB[id];
+  if(!confirm('Put all ' + t.ns.length + ' questions of “' + t.name + '” back into Live?')) return;
+  t.ns.forEach(function(n){ S.st[n] = 'live'; });
+  delete S.at[id + ':known'];
+  openSel(id, 'live');
+}
+
+function renderLevels(){
+  var h = '';
+  TIERS.forEach(function(t){
+    var lc = 'var(--' + t.lvl + ')';
+    if(t.fixed){
+      var on = S.sel.t === t.id;
+      h += '<div class="lv fixed" style="--lc:' + lc + '"><button class="fixbtn' + (on ? ' on' : '') + '" data-t="' + t.id + '" data-p="fix">' +
+           '<span class="num">' + t.ns.length + '</span><b>' + esc(t.name) + '</b><small>' + esc(t.sub) + '</small></button></div>';
+      return;
+    }
+    var nl = count(t, 'live'), nk = count(t, 'known');
+    h += '<div class="lv" style="--lc:' + lc + '">' +
+      '<div class="name"><b>' + esc(t.name) + '</b><small>' + t.ns.length + ' question' + (t.ns.length === 1 ? '' : 's') + (t.sub ? ' · ' + esc(t.sub) : '') + '</small></div>' +
+      '<button class="pb live' + (S.sel.t === t.id && S.sel.p === 'live' ? ' on' : '') + '" data-t="' + t.id + '" data-p="live"><span class="num">' + nl + '</span><span class="lbl">Live</span></button>' +
+      '<button class="pb known' + (S.sel.t === t.id && S.sel.p === 'known' ? ' on' : '') + '" data-t="' + t.id + '" data-p="known"><span class="num">' + nk + '</span><span class="lbl">Known</span></button>' +
+      '<button class="rst" data-r="' + t.id + '" title="All back to Live" aria-label="Put all of this level back into Live">↺</button>' +
+      '</div>';
+  });
+  $('levels').innerHTML = h;
+}
+
+function cardHTML(it){
+  var h = '<div class="qnum">' + it.label + '</div>' + it.body;
+  if(it.k === 'mcq'){
+    var done = picked !== null;
+    h += '<ul class="opts' + (done ? ' locked' : '') + '">';
+    it.opts.forEach(function(o){
+      var cls = 'opt';
+      if(done){ if(o[0] === it.c) cls += ' correct'; else if(o[0] === picked) cls += ' wrong'; else cls += ' dim'; }
+      h += '<li class="' + cls + '" data-k="' + o[0] + '"><span class="k">' + o[0] + '.</span><span>' + o[1] + '</span></li>';
+    });
+    h += '</ul>';
+    if(done){
+      var ok = picked === it.c, fixed = TB[S.sel.t].fixed, msg;
+      if(fixed) msg = ok ? '✓ Correct' : '✗ Wrong — the answer is ' + it.c;
+      else if(ok) msg = '✓ Correct — ' + (picked_prev === 'known' ? 'stays in Known' : 'moved to Known');
+      else msg = '✗ Wrong — the answer is ' + it.c + (picked_prev === 'known' ? ' · moved back to Live' : ' · stays in Live');
+      h += '<div class="verdict ' + (ok ? 'ok' : 'no') + '">' + msg + '</div>';
+    } else h += '<div class="tap">Tap the answer you think is correct</div>';
+  } else if(revealed){
+    h += '<div class="answer"><div class="al">Απάντηση</div>';
+    if(it.ans) h += '<div class="at">' + it.ans + '</div>';
+    if(it.aimg) h += '<img alt="" src="' + it.aimg + '">';
+    h += '</div>';
+  }
+  return h;
+}
+
+function render(stay){
+  renderLevels();
+  var t = TB[S.sel.t], l = list();
+  var card = $('card'), ctr = $('controls');
+  card.style.setProperty('--lc', 'var(--' + t.lvl + ')');
+  $('studying').innerHTML = 'Studying <b>' + esc(t.name) + (t.fixed ? '' : ' · ' + (S.sel.p === 'live' ? 'Live' : 'Known')) + '</b>';
+  $('prev').disabled = $('next').disabled = $('shuffle').disabled = !l.length;
+  if(cur == null || S.ord[t.id].indexOf(cur) < 0){
+    $('counter').textContent = '0 / 0';
+    card.innerHTML = '<div class="empty">' + (S.sel.p === 'known'
+      ? 'Nothing in Known here yet.'
+      : 'Live is empty — everything in this level is Known.<br>Tap <b>↺</b> to put it all back into Live.') + '</div>';
+    ctr.innerHTML = '';
+    return;
+  }
+  var it = BY[cur], pos = l.indexOf(cur);
+  $('counter').textContent = (pos > -1 ? (pos + 1) : '–') + ' / ' + l.length;
+  card.innerHTML = cardHTML(it);
+
+  var c = '';
+  if(it.k !== 'mcq' && !revealed) c += '<button class="big" id="show">Show answer</button>';
+  var answered = it.k === 'mcq' ? picked !== null : revealed;
+  if(answered && !t.fixed){
+    var s = S.st[cur];
+    c += '<div class="sortrow">' +
+      '<button class="s-live' + (s === 'live' ? ' cur' : '') + '" data-f="live">Live<small>see again</small></button>' +
+      '<button class="s-known' + (s === 'known' ? ' cur' : '') + '" data-f="known">Known<small>I know it</small></button></div>';
+  }
+  ctr.innerHTML = c;
+}
+
+$('levels').addEventListener('click', function(e){
+  var r = e.target.closest('[data-r]'); if(r){ resetTier(r.dataset.r); return; }
+  var b = e.target.closest('[data-t]'); if(!b) return;
+  openSel(b.dataset.t, b.dataset.p);
+});
+$('card').addEventListener('click', function(e){
+  var li = e.target.closest('.opt[data-k]'); if(li) pick(li.dataset.k);
+});
+$('controls').addEventListener('click', function(e){
+  if(e.target.closest('#show')){ revealed = true; render(true); return; }
+  var f = e.target.closest('[data-f]'); if(f) file(f.dataset.f);
+});
+$('next').addEventListener('click', function(){ step(1); });
+$('prev').addEventListener('click', function(){ step(-1); });
+$('shuffle').addEventListener('click', shuffle);
+
+/* go to question */
+(function(){
+  var inp = $('gotoN'), msg = $('gotoMsg');
+  var all = ITEMS.map(function(i){ return i.n; }).sort(function(a,b){ return a-b; });
+  function go(){
+    var v = parseInt(inp.value, 10);
+    if(!BY[v]){ msg.textContent = 'In this app: ' + all.join(', '); return; }
+    var tid = TIER_OF[v], extra = '';
+    if(tid == null){ tid = TIERS.filter(function(t){ return t.ns.indexOf(v) > -1; })[0].id; openSel(tid, 'fix', v); }
+    else openSel(tid, S.st[v], v);
+    var also = TIERS.filter(function(t){ return t.fixed && t.id !== tid && t.ns.indexOf(v) > -1; });
+    if(also.length) extra = ' (also in ' + also.map(function(t){ return t.name; }).join(', ') + ')';
+    var t = TB[tid];
+    msg.textContent = 'Question ' + v + ' — in ' + t.name + (t.fixed ? '' : ' · ' + (S.st[v] === 'live' ? 'Live' : 'Known')) + extra;
+    inp.value = ''; inp.blur();
+  }
+  $('gotoBtn').addEventListener('click', go);
+  inp.addEventListener('keydown', function(e){ e.stopPropagation(); if(e.key === 'Enter'){ e.preventDefault(); go(); } });
+  inp.addEventListener('input', function(){ msg.textContent = ''; });
+})();
+
+/* backup / restore / reset */
+$('backup').addEventListener('click', function(){
+  var txt = JSON.stringify({app:APP.id, saved:new Date().toISOString(), state:S});
+  var d = new Date(), p = function(n){ return String(n).padStart(2,'0'); };
+  var name = APP.id + '-backup-' + d.getFullYear() + p(d.getMonth()+1) + p(d.getDate()) + '-' + p(d.getHours()) + p(d.getMinutes()) + '.json';
+  try{
+    var url = URL.createObjectURL(new Blob([txt], {type:'application/json'}));
+    var a = document.createElement('a'); a.href = url; a.download = name;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 4000);
+  }catch(e){ prompt('Copy this backup text and keep it somewhere safe:', txt); }
+});
+$('restore').addEventListener('click', function(){ $('restoreFile').click(); });
+$('restoreFile').addEventListener('change', function(ev){
+  var f = ev.target.files && ev.target.files[0]; ev.target.value = '';
+  if(!f) return;
+  var r = new FileReader();
+  r.onload = function(){
+    try{
+      var d = JSON.parse(r.result);
+      if(!d || d.app !== APP.id || !d.state || !d.state.st) throw 0;
+      var k = 0; FILING.forEach(function(t){ t.ns.forEach(function(n){ if(d.state.st[n] === 'known') k++; }); });
+      if(!confirm('Restore this backup? ' + k + ' question(s) in Known. Your current progress will be replaced.')) return;
+      S = d.state; save(); load(); openSel(S.sel.t, S.sel.p);
+    }catch(e){ alert('That file is not a backup from this app.'); }
+  };
+  r.readAsText(f);
+});
+$('resetAll').addEventListener('click', function(){
+  if(!confirm('Put every question back into Live in every level?')) return;
+  FILING.forEach(function(t){ t.ns.forEach(function(n){ S.st[n] = 'live'; }); });
+  S.at = {}; S.ord = {}; save(); load();
+  openSel(TIERS[0].id, TIERS[0].fixed ? 'fix' : 'live');
+});
+
+$('foot').textContent = ITEMS.length + ' questions · November 2026';
+load();
+openSel(S.sel.t, S.sel.p);
+})();
+</script>
+<script>if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js").catch(function(){});});}</script>
+</body>
+</html>

@@ -1,0 +1,31 @@
+{
+  "id": "/historyfinal/?app=historyfinal-2026-10-19",
+  "name": "History Final — ΠΕΓΠ",
+  "short_name": "History Final",
+  "start_url": "/historyfinal/index.html",
+  "scope": "/historyfinal/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#121417",
+  "theme_color": "#121417",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
